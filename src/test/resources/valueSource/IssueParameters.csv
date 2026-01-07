@@ -1,0 +1,7 @@
+summary,description,expectedStatusCode,isPositive
+"Rest API Bug","Found a bug in user deletion",200,true
+"Feature Request","Add more colors to the UI",200,true
+"123456789","Numerical summary test",200,true
+"","Summary is empty",400,false
+"A very long summary that might be truncated or rejected by the server if it exceeds the character limit of two hundred and fifty five characters which is standard for many databases","Long summary",200,true
+"Valid Summary", "", 200, true

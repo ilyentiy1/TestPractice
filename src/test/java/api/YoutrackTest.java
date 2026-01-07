@@ -1,7 +1,9 @@
 package api;
 
+import api.dto.IssueDTO;
+import api.dto.LeaderDTO;
+import api.dto.ProjectDTO;
 import api.dto.UserDTO;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
@@ -9,173 +11,200 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
+import static api.UtilClass.*;
+import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.*;
 
-import static api.Specifications.reqSpec;
+import static api.Specifications.requestSpec;
 
 @DisplayName("API-Тестирование Youtrack")
 public class YoutrackTest {
 
-    private UserDTO tmpUser;
+    
+    @Nested
+    @DisplayName("Тестирование операций над пользователем")
+    class UserTest {
+        private UserDTO tmpUser;
 
-    @BeforeEach
-    public void prepareUser() {
-        tmpUser = RestAssured.given()
-                .spec(reqSpec())
-                .body(new UserDTO("tmpUser" + System.currentTimeMillis()))
-                .queryParam("fields", "id,login")
+        private final String usersEndpoint = "/hub/api/rest/users";
+
+        @BeforeEach
+        public void prepareUser() {
+            tmpUser = given()
+                    .spec(requestSpec())
+                    .body(new UserDTO("tmpUser" + System.currentTimeMillis()))
+                    .queryParam("fields", "id,login")
+                    .when()
+                    .post(usersEndpoint)
+                    .then()
+                    .statusCode(200)
+                    .extract().body().as(UserDTO.class);
+        }
+
+        @Test
+        @DisplayName("Получить список пользователей")
+        @Execution(ExecutionMode.CONCURRENT)
+        public void getUserTest() {
+            given()
+                    .spec(requestSpec())
+                    .queryParam("fields", "id,login,name")
+                    .when()
+                    .get(usersEndpoint)
+                    .then()
+                    .log().all()
+                    .statusCode(200);
+        }
+
+        @ParameterizedTest
+        @DisplayName("Параметризованное тестирование создание пользователя")
+        @CsvFileSource(resources = "/valueSource/UserParameters.csv", numLinesToSkip = 1)
+        @Execution(ExecutionMode.CONCURRENT)
+        public void createUserParameterizedTest(String login, String name, int expectedStatusCode, boolean isPositive) {
+
+            printUserTestInfo(login, name, expectedStatusCode, isPositive);
+
+            Response response = given()
+                    .spec(requestSpec())
+                    .body(new UserDTO(login, name))
+                    .queryParam("fields", "id,login")
+                    .when()
+                    .post(usersEndpoint);
+
+            response.then()
+                    .statusCode(expectedStatusCode)
+                    .log().all();
+
+            if (response.getStatusCode() == 200) {
+                response.then()
+                        .body(matchesJsonSchemaInClasspath("jsonSchema/userResponseSchema.json"));
+            }
+
+        }
+
+        @ParameterizedTest
+        @DisplayName("Параметризованное тестирование обновление данных пользователя")
+        @CsvFileSource(resources = "/valueSource/UserParameters.csv", numLinesToSkip = 1)
+        @Execution(ExecutionMode.CONCURRENT)
+        public void updateUserParameterizedTest(String login, String name, int expectedStatusCode, boolean isPositive) {
+
+            printUserTestInfo(login, name, expectedStatusCode, isPositive);
+
+            given()
+                    .spec(requestSpec())
+                    .pathParam("user_id", tmpUser.getId())
+                    .body(new UserDTO(login))
+                    .queryParam("fields", "id,login")
+                    .when()
+                    .post(usersEndpoint+ "/{user_id}")
+                    .then()
+                    .log().all()
+                    .statusCode(expectedStatusCode);
+        }
+
+        @Test
+        @DisplayName("Удалить пользователя")
+        @Execution(ExecutionMode.CONCURRENT)
+        public void deleteUserTest() {
+            given()
+                    .spec(requestSpec())
+                    .pathParam("user_id", tmpUser.getId())
+                    .when()
+                    .delete(usersEndpoint+ "/{user_id}")
+                    .then()
+                    .log().all()
+                    .statusCode(200);
+        }
+
+        @AfterEach
+        public void cleanUp() {
+            given()
+                    .spec(requestSpec())
+                    .pathParam("user_id", tmpUser.getId())
+                    .when()
+                    .delete(usersEndpoint+ "/{user_id}");
+        }
+    }
+
+
+    @Test
+    @DisplayName("Получить список задач")
+    @Execution(ExecutionMode.CONCURRENT)
+    public void getIssueTest() {
+        given()
+                .spec(requestSpec())
+                .queryParam("fields", "summary,idReadable,description,project(id,name)")
                 .when()
-                .post("/hub/api/rest/users")
+                .get("/api/issues")
                 .then()
                 .statusCode(200)
-                .extract().body().as(UserDTO.class);
+                .log().all();
     }
 
-    @Test
-    @DisplayName("Получить список пользователей")
-    @Execution(ExecutionMode.CONCURRENT)
-    public void getUserTest() {
-        RestAssured.given()
-                .spec(reqSpec())
-                .queryParam("fields", "id,login,name")
-                .when()
-                .get("/hub/api/rest/users")
-                .then()
-                .log().all()
-                .statusCode(200);
-    }
 
-    @Test
-    @DisplayName("Создать пользователя")
-    @Execution(ExecutionMode.CONCURRENT)
-    public void createUserTest(){
-        RestAssured.given()
-                .spec(reqSpec())
-                .body(new UserDTO("John.Gee"))
-                .queryParam("fields", "id,login")
-                .when()
-                .post("/hub/api/rest/users")
-                .then()
-                .log().all()
-                .body(matchesJsonSchemaInClasspath("jsonSchema/userResponseSchema.json"));
-    }
 
     @ParameterizedTest
-    @DisplayName("Параметризованное тестирование создание пользователя")
-    @CsvFileSource(resources = "/valueSource/UserParameters.csv", numLinesToSkip = 1)
-    public void createUserParameterizedTest(String login, String name, int expectedStatusCode, boolean isPositive) {
-        System.out.println("Login: " + login +
-                "\nName: " + name +
-                "\nExpected Status code: " + expectedStatusCode +
-                "\nIs positive?: " + isPositive);
+    @DisplayName("Создание задачи")
+    @CsvFileSource(resources = "/valueSource/IssueParameters.csv", numLinesToSkip = 1)
+    @Execution(ExecutionMode.CONCURRENT)
+    public void createIssueTest(String summary, String description,
+                                int expectedStatusCode, boolean isPositive) {
 
-        Response response = RestAssured.given()
-                .spec(reqSpec())
-                .body(new UserDTO(login, name))
-                .queryParam("fields", "id,login")
+        printIssueTestInfo(summary, description, expectedStatusCode, isPositive);
+
+        Response response = given()
+                .spec(requestSpec())
+                .body(new IssueDTO(summary, description,
+                        new ProjectDTO("0-1")))
+                .queryParam("fields", "summary,description,idReadable,project(id,name)")
                 .when()
-                .post("/hub/api/rest/users");
+                .post("/api/issues");
 
-        response.then().statusCode(expectedStatusCode);
+        response.then()
+                .statusCode(expectedStatusCode)
+                .log().all();
 
         if(response.getStatusCode() == 200) {
             response.then()
-                    .log().all()
-                    .body(matchesJsonSchemaInClasspath("jsonSchema/userResponseSchema.json"));
+                    .body(matchesJsonSchemaInClasspath("jsonSchema/issueResponseSchema.json"));
         }
-
     }
+
 
     @ParameterizedTest
-    @DisplayName("Параметризованное тестирование обновление данных пользователя")
-    @CsvFileSource(resources = "/valueSource/UserParameters.csv", numLinesToSkip = 1)
-    public void updateUserParameterizedTest(String login, String name, int expectedStatusCode, boolean isPositive) {
-        System.out.println("Login: " + login +
-                "\nName: " + name +
-                "\nExpected Status code: " + expectedStatusCode +
-                "\nIs positive?: " + isPositive);
+    @DisplayName("Создание проекта")
+    @CsvFileSource(resources = "/valueSource/ProjectParameters.csv", numLinesToSkip = 1)
+    @Execution(ExecutionMode.CONCURRENT)
+    public void createProjectTest(String name, String shortName,
+                                  String description, int expectedStatusCode, boolean isPositive) {
 
-        RestAssured.given()
-                .spec(reqSpec())
-                .pathParam("user_id", tmpUser.getId())
-                .body(new UserDTO(login))
-                .queryParam("fields", "id,login")
+        printProjectTestInfo(name, shortName, description, expectedStatusCode, isPositive);
+
+        Response response = given()
+                .spec(requestSpec())
+                .body(new ProjectDTO(name, shortName, description, new LeaderDTO("2-1")))
+                .queryParam("fields", "id, name, shortName")
                 .when()
-                .post("/hub/api/rest/users/{user_id}")
-                .then()
+                .post("/api/admin/projects");
+
+        response.then()
                 .log().all()
                 .statusCode(expectedStatusCode);
+
     }
 
-    @Test
-    @DisplayName("Обновить пользователя")
+
+    @ParameterizedTest
+    @DisplayName("Проверка авторизации по постоянному токену")
+    @CsvFileSource(resources = "/valueSource/AuthParameters.csv", numLinesToSkip = 1)
     @Execution(ExecutionMode.CONCURRENT)
-    public void updateUserTest(){
-        RestAssured.given()
-                .spec(reqSpec())
-                .pathParam("user_id", tmpUser.getId())
-                .queryParam("fields", "id,login")
-                .body(new UserDTO("John.Doe", "John Doe"))
+    public void authTest(String token, int expectedStatusCode) {
+        given()
+                .header("Authorization", "Bearer " + token)
                 .when()
-                .post("/hub/api/rest/users/{user_id}")
+                .get("http://localhost:8080/api/users")
                 .then()
-                .log().all()
-                .statusCode(200);
+                .statusCode(expectedStatusCode)
+                .log().all();
     }
 
-
-    @Test
-    @DisplayName("Удалить пользователя")
-    @Execution(ExecutionMode.CONCURRENT)
-    public void deleteUserTest() {
-        RestAssured.given()
-                .spec(reqSpec())
-                .pathParam("user_id", tmpUser.getId())
-                .log().uri()
-                .when()
-                .delete("/hub/api/rest/users/{user_id}")
-                .then()
-                .log().all()
-                .statusCode(200);
-    }
-
-
-    @AfterEach
-    public void cleanUp() {
-        RestAssured.given()
-                .spec(reqSpec())
-                .pathParam("user_id", tmpUser.getId())
-                .when()
-                .delete("hub/api/rest/users/{user_id}");
-    }
-//
-//    @Test
-//    @DisplayName("Получить список задач")
-//    public void getIssueTest() {
-//        Response response = given()
-//                .spec(reqSpec())
-//                .queryParam("fields", "summary, idReadable, description")
-//                .when()
-//                .get("/api/issues");
-//        System.out.println("Status Code: " + response.getStatusCode());
-//        System.out.println("Response: " + response.getBody().asString());
-//    }
-//
-//    @Test
-//    @DisplayName("Создать задачу")
-//    public void createIssueTest() {
-//
-//    }
-//
-//    @Test
-//    @DisplayName("Обновить задачу")
-//    public void updateIssueTest() {
-//
-//    }
-//
-//    @Test
-//    @DisplayName("Удалить задачу")
-//    public void deleteIssueTest() {
-//
-//    }
 }

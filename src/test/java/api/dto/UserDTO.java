@@ -21,4 +21,5 @@ public class UserDTO {
         this.login = login;
         this.name = name;
     }
+
 }

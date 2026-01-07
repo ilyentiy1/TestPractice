@@ -5,14 +5,17 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 
+import static io.restassured.http.ContentType.JSON;
+
 public class Specifications {
     private static final String token = "perm-aWx5ZW50aXlf.NDMtMQ==.iiibOJ4PrXyoSZjEsNOEKYHRkHsGI8";
-    public static RequestSpecification reqSpec() {
+
+    public static RequestSpecification requestSpec() {
         return new RequestSpecBuilder()
                 .setBaseUri("http://localhost:8080")
                 .addHeader("Authorization", "Bearer " + token)
-                .addHeader("Accept", "application/json")
-                .addHeader("Content-Type", "application/json")
+                .setAccept(JSON)
+                .setContentType(JSON)
                 .build();
     }
 

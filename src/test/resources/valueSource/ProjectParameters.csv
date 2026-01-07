@@ -1,0 +1,8 @@
+projectName,projectId,description,expectedStatusCode,isPositive
+"Mobile App Development","MAD","Project for mobile team",200,true
+"Research & Development","RD1","Project with symbols",200,true
+"P","PRJ","Minimum project name length",200,true
+"","NOPROJ","Empty project name",400,false
+"Duplicate Project","MAD","ID already exists",400,false
+"Invalid ID","!@#","Invalid characters in ID",400,false
+"Long Name Project","LNP","Valid description",200,true
