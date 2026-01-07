@@ -125,7 +125,6 @@ public class YoutrackTest {
         }
     }
 
-
     @Test
     @DisplayName("Получить список задач")
     @Execution(ExecutionMode.CONCURRENT)
@@ -139,8 +138,6 @@ public class YoutrackTest {
                 .statusCode(200)
                 .log().all();
     }
-
-
 
     @ParameterizedTest
     @DisplayName("Создание задачи")
@@ -179,16 +176,16 @@ public class YoutrackTest {
 
         printProjectTestInfo(name, shortName, description, expectedStatusCode, isPositive);
 
-        Response response = given()
+        given()
                 .spec(requestSpec())
                 .body(new ProjectDTO(name, shortName, description, new LeaderDTO("2-1")))
-                .queryParam("fields", "id, name, shortName")
+                .queryParam("fields", "id,name,shortName")
                 .when()
-                .post("/api/admin/projects");
-
-        response.then()
-                .log().all()
+                .post("/api/admin/projects")
+                .then()
+                .log().ifValidationFails()
                 .statusCode(expectedStatusCode);
+
 
     }
 
@@ -203,8 +200,8 @@ public class YoutrackTest {
                 .when()
                 .get("http://localhost:8080/api/users")
                 .then()
-                .statusCode(expectedStatusCode)
-                .log().all();
+                .log().ifValidationFails()
+                .statusCode(expectedStatusCode);
     }
 
 }
