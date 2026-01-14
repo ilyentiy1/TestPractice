@@ -1,0 +1,7 @@
+summary,description
+"Rest API Bug","Found a bug in user deletion"
+"Feature Request","Add more colors to the UI"
+"123456789","Numerical summary test"
+"","Summary is empty"
+"A very long summary that might be truncated or rejected by the server if it exceeds the character limit of two hundred and fifty five characters which is standard for many databases","Long summary"
+"Valid Summary",""

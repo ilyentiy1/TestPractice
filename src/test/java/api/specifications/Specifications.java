@@ -1,19 +1,21 @@
-package api;
+package api.specifications;
 
+import static api.utils.ConfigProvider.URL;
+import static api.utils.ConfigProvider.TOKEN;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.filter.log.LogDetail;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 
 import static io.restassured.http.ContentType.JSON;
 
 public class Specifications {
-    private static final String token = "perm-aWx5ZW50aXlf.NDMtMQ==.iiibOJ4PrXyoSZjEsNOEKYHRkHsGI8";
 
     public static RequestSpecification requestSpec() {
         return new RequestSpecBuilder()
-                .setBaseUri("http://localhost:8080")
-                .addHeader("Authorization", "Bearer " + token)
+                .setBaseUri(URL)
+                .addHeader("Authorization", "Bearer " + TOKEN)
                 .setAccept(JSON)
                 .setContentType(JSON)
                 .build();
@@ -28,6 +30,7 @@ public class Specifications {
     public static ResponseSpecification responseSpec(int status) {
         return new ResponseSpecBuilder()
                 .expectStatusCode(status)
+                .log(LogDetail.ALL)
                 .build();
     }
 }

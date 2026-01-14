@@ -1,6 +1,6 @@
-package api;
+package api.utils;
 
-public class UtilClass {
+public class Printer {
 
     public static void printUserTestInfo(String login, String name,
                                          int expectedStatusCode, boolean isPositive) {
