@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
+import static api.specifications.Specifications.getIssueResponseSpec;
 import static api.specifications.Specifications.requestSpec;
 import static api.utils.ConfigProvider.ENDPOINT_ISSUE;
 import static io.restassured.RestAssured.given;
@@ -20,7 +21,6 @@ public class GetIssueTest extends BaseRestAssuredTest {
                 .when()
                 .get(ENDPOINT_ISSUE)
                 .then()
-                .statusCode(200)
-                .log().all();
+                .spec(getIssueResponseSpec());
     }
 }
