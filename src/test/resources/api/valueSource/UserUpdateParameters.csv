@@ -1,7 +1,7 @@
 login,name,expectedStatusCode,isPositive
 "John.Gable","John Gable",200,true
 "allissson39574","Digital Girl",200,true
-"A","Short Login",400,true
+"A","Short Login",400,false
 "", "Empty Login",400,false
 "invalid@character!","Bad Symbols",400,false
 "very.long.name.that.might.exceed.limit.of.the.database.field.validation.test","Long Name",400,false

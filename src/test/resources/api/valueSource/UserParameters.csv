@@ -1,7 +1,7 @@
 login,name,expectedStatusCode,isPositive
 "valid.user.1","Valid User One",200,true
 "user-with-numbers123","Digital Human",200,true
-"A","Short Login",400,true
+"A","Short Login",400,false
 "", "Empty Login",400,false
 "invalid@character!","Bad Symbols",400,false
 "very.long.name.that.might.exceed.limit.of.the.database.field.validation.test","Long Name",400,false
