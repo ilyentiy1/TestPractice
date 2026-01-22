@@ -3,11 +3,10 @@ package api.client;
 import api.dto.LeaderDTO;
 import api.dto.ProjectDTO;
 import api.specs.response.ProjectSpecs;
-import api.utils.ConfigProvider;
 import io.restassured.response.Response;
 import lombok.Getter;
 
-import static api.specs.request.BaseRequestSpecification.requestSpec;
+import static api.specs.request.RequestSpecs.projectRequestSpec;
 import static io.restassured.RestAssured.given;
 
 public class ProjectClient {
@@ -17,11 +16,11 @@ public class ProjectClient {
 
     public ProjectClient createProject(String name, String shortName, String description) {
         response = given()
-                .spec(requestSpec())
+                .spec(projectRequestSpec())
                 .body(new ProjectDTO(name, shortName, description, new LeaderDTO("2-1")))
                 .queryParam("fields", "id,name,shortName")
                 .when()
-                .post(ConfigProvider.ENDPOINT_PROJECT);
+                .post();
         if(response.statusCode() == 200) {
             currentId = response.jsonPath().getString("id");
         }
@@ -30,29 +29,29 @@ public class ProjectClient {
 
     public ProjectClient readProjects() {
         response = given()
-                .spec(requestSpec())
+                .spec(projectRequestSpec())
                 .queryParam("fields", "id, name")
                 .when()
-                .get(ConfigProvider.ENDPOINT_PROJECT);
+                .get();
         return this;
     }
 
     public ProjectClient readProjectById() {
         response = given()
-                .spec(requestSpec())
+                .spec(projectRequestSpec())
                 .queryParam("fields", "id, name")
                 .pathParam("project_id", currentId)
                 .when()
-                .get(ConfigProvider.ENDPOINT_PROJECT + "/{project_id}");
+                .get("/{project_id}");
         return this;
     }
 
     public ProjectClient deleteProject() {
         response = given()
-                .spec(requestSpec())
+                .spec(projectRequestSpec())
                 .pathParam("project_id", currentId)
                 .when()
-                .delete(ConfigProvider.ENDPOINT_PROJECT + "/{project_id}");
+                .delete("/{project_id}");
         return this;
     }
 

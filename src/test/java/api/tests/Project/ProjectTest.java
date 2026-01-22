@@ -1,15 +1,18 @@
 package api.tests.Project;
 
+import api.BaseRestAssuredTest;
+import api.client.ProjectClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
 @DisplayName("Тестирование CRUD над проектом")
-public class ProjectTest extends ProjectBaseTest {
+public class ProjectTest extends BaseRestAssuredTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/api/valueSource/ProjectParameters.csv", numLinesToSkip = 1)
     public void createProjectTest(String name, String shortName,
                                   String description, int expectedStatusCode, boolean isPositive) {
+        ProjectClient projectClient = new ProjectClient();
         /*
         Если позитивный сценарий, то:
         1.Создание проекта

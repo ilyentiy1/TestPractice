@@ -1,15 +1,19 @@
 package api.tests.User;
 
+import api.BaseRestAssuredTest;
+import api.client.UserClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
 @DisplayName("Тестирование обновления данных пользователя")
-public class UserUpdateTest extends UserBaseTest{
+public class UserUpdateTest extends BaseRestAssuredTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/api/valueSource/UserUpdateParameters.csv", numLinesToSkip = 1)
     public void userUpdateTest(String login, String name, int expectedStatusCode, boolean isPositive) {
+
+        UserClient userClient = new UserClient();
         /*
         Если сценарий позитивный то:
         1.Создание случайного пользователя

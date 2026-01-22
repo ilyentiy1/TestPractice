@@ -1,9 +1,9 @@
 package api.client;
 
 import api.specs.response.AuthSpecs;
-import api.utils.ConfigProvider;
 import io.restassured.response.Response;
 
+import static api.specs.request.RequestSpecs.authRequestSpec;
 import static io.restassured.RestAssured.given;
 
 public class AuthClient {
@@ -11,9 +11,9 @@ public class AuthClient {
 
     public AuthClient executeAuth(String token) {
         response =  given()
-                .header("Authorization", "Bearer " + token)
+                .spec(authRequestSpec(token))
                 .when()
-                .get(ConfigProvider.ENDPOINT_AUTH);
+                .get();
         return this;
     }
 

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-import static api.specs.request.BaseRequestSpecification.requestSpec;
+import static api.specs.request.RequestSpecs.userRequestSpec;
 import static api.utils.ConfigProvider.ENDPOINT_USER;
 import static io.restassured.RestAssured.given;
 
@@ -19,11 +19,11 @@ public class UserClient {
 
     public UserClient createUser(String login, String name) {
         response = given()
-                        .spec(requestSpec())
+                        .spec(userRequestSpec())
                         .body(new UserDTO(login, name))
                         .queryParam("fields", "id,login")
                         .when()
-                        .post(ENDPOINT_USER);
+                        .post();
         if(response.statusCode() == 200) {
             currentId = response.jsonPath().getString("id");
         }
@@ -32,52 +32,51 @@ public class UserClient {
 
     public UserClient createTmpUser() {
         response = given()
-                .spec(requestSpec())
+                .spec(userRequestSpec())
                 .body(new UserDTO("user_" + UUID.randomUUID().toString().substring(0, 8)))
                 .queryParam("fields", "id,login")
                 .when()
-                .post(ENDPOINT_USER);
+                .post();
         currentId = response.jsonPath().getString("id");
         return this;
     }
 
     public UserClient readUsers() {
         response = given()
-                        .spec(requestSpec())
+                        .spec(userRequestSpec())
                         .queryParam("fields", "id,login,name")
                         .when()
-                        .get(ENDPOINT_USER);
+                        .get();
         return this;
     }
 
     public UserClient readUserById() {
         response = given()
-                .spec(requestSpec())
+                .spec(userRequestSpec())
                 .queryParam("fields", "id,login,name")
                 .pathParam("user_id", currentId)
                 .when()
-                .get(ENDPOINT_USER + "/{user_id}");
+                .get( "/{user_id}");
         return this;
     }
 
     public UserClient updateUser(String login, String name) {
         response = given()
-                        .spec(requestSpec())
+                        .spec(userRequestSpec())
                         .pathParam("user_id", currentId)
                         .body(new UserDTO(login, name))
                         .queryParam("fields", "id,login")
                         .when()
-                        .post(ENDPOINT_USER + "/{user_id}");
-        //currentId = response.jsonPath().getString("id");
+                        .post( "/{user_id}");
         return this;
     }
 
     public UserClient deleteUser() {
         response = given()
-                .spec(requestSpec())
+                .spec(userRequestSpec())
                 .pathParam("user_id", currentId)
                 .when()
-                .delete(ENDPOINT_USER + "/{user_id}");
+                .delete( "/{user_id}");
         return this;
     }
 

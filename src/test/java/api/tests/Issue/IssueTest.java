@@ -2,15 +2,17 @@ package api.tests.Issue;
 
 import api.BaseRestAssuredTest;
 
+import api.client.IssueClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
 @DisplayName("Тестирование CRUD над сущностью задачи")
-public class IssueTest extends IssueBaseTest {
+public class IssueTest extends BaseRestAssuredTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/api/valueSource/IssueParameters.csv", numLinesToSkip = 1)
     public void issueTest(String summary, String description, int expectedStatusCode, boolean isPositive) {
+        IssueClient issueClient = new IssueClient();
         /*
         Если позитивный сценарий, то:
         1.Создание сущности задачи
