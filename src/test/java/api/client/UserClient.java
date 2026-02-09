@@ -7,8 +7,7 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-import static api.specs.request.RequestSpecs.userRequestSpec;
-import static api.utils.ConfigProvider.ENDPOINT_USER;
+import static api.specs.request.UserBaseRequestSpec.userRequestSpec;
 import static io.restassured.RestAssured.given;
 
 public class UserClient {

@@ -6,7 +6,7 @@ import api.specs.response.ProjectSpecs;
 import io.restassured.response.Response;
 import lombok.Getter;
 
-import static api.specs.request.RequestSpecs.projectRequestSpec;
+import static api.specs.request.ProjectRequestSpec.projectRequestSpec;
 import static io.restassured.RestAssured.given;
 
 public class ProjectClient {

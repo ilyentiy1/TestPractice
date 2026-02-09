@@ -6,8 +6,7 @@ import api.specs.response.IssueSpecs;
 import io.restassured.response.Response;
 import lombok.Getter;
 
-import static api.specs.request.RequestSpecs.issueRequestSpec;
-import static api.utils.ConfigProvider.ENDPOINT_ISSUE;
+import static api.specs.request.IssueRequestSpec.issueRequestSpec;
 import static io.restassured.RestAssured.given;
 
 public class IssueClient {

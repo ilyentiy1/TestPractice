@@ -26,6 +26,10 @@ public class UserSpecs {
     }
 
     public UserSpecs userReadCheck() {
+        response
+                .then()
+                .log().all()
+                .statusCode(200);
 
         return this;
     }
@@ -45,13 +49,6 @@ public class UserSpecs {
                 .statusCode(200);
     }
 
-    public UserSpecs baseCheck() {
-        response
-                .then()
-                .log().all()
-                .statusCode(200);
-        return this;
-    }
 
     public UserClient then() {
         return this.userClient;

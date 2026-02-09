@@ -1,44 +1,45 @@
-package api.tests.Project;
+package api.tests;
 
-import api.BaseRestAssuredTest;
 import api.client.ProjectClient;
+import api.specs.response.ProjectSpecs;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
 @DisplayName("Тестирование CRUD над проектом")
-public class ProjectTest extends BaseRestAssuredTest {
+public class ProjectTest extends BaseTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/api/valueSource/ProjectParameters.csv", numLinesToSkip = 1)
     public void createProjectTest(String name, String shortName,
                                   String description, int expectedStatusCode, boolean isPositive) {
-        ProjectClient projectClient = new ProjectClient();
+
         /*
         Если позитивный сценарий, то:
-        1.Создание проекта
-        2.Чтение проекта
-        3.Удаление проекта
+        1. Создание проекта
+        2. Чтение проекта
+        3. Удаление проекта
         Если негативный сценарий, то:
-        1.Попытка создания сущности
-        2.Вывод сообщения с ошибкой
+        1. Попытка создания сущности
+        2. Вывод сообщения с ошибкой
          */
+
+        ProjectSpecs projectSpecs = new ProjectClient()
+                .createProject(name, shortName, description)
+                .passes();
+
         if(isPositive) {
-            projectClient
-                    .createProject(name, shortName, description)
-                    .passes()
-                        .projectCreateCheck(expectedStatusCode)
+            projectSpecs
+                    .projectCreateCheck(expectedStatusCode)
                     .then()
                     .readProjectById()
                     .passes()
-                        .projectReadCheck()
+                    .projectReadCheck()
                     .then()
                     .deleteProject()
                     .passes()
-                        .projectDeleteCheck();
+                    .projectDeleteCheck();
         } else {
-            projectClient
-                    .createProject(name, shortName, description)
-                    .passes()
+            projectSpecs
                     .projectCreateCheck(expectedStatusCode);
         }
 

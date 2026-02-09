@@ -1,31 +1,33 @@
-package api.tests.Issue;
-
-import api.BaseRestAssuredTest;
+package api.tests;
 
 import api.client.IssueClient;
+import api.specs.response.IssueSpecs;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
 @DisplayName("Тестирование CRUD над сущностью задачи")
-public class IssueTest extends BaseRestAssuredTest {
+public class IssueTest extends BaseTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/api/valueSource/IssueParameters.csv", numLinesToSkip = 1)
     public void issueTest(String summary, String description, int expectedStatusCode, boolean isPositive) {
-        IssueClient issueClient = new IssueClient();
+
         /*
         Если позитивный сценарий, то:
-        1.Создание сущности задачи
-        2.Чтение задачи
-        3.Удаление задачи
+        1. Создание сущности задачи
+        2. Чтение задачи
+        3. Удаление задачи
         Если негативный сценарий, то:
-        1.Попытка создания сущности
-        2.Вывод ошибки
+        1. Попытка создания сущности
+        2. Вывод ошибки
          */
+
+        IssueSpecs issueSpecs = new IssueClient()
+                .createIssue(summary, description)
+                .passes();
+
         if(isPositive) {
-            issueClient
-                    .createIssue(summary, description)
-                    .passes()
+            issueSpecs
                         .issueCreateCheck(expectedStatusCode)
                     .then()
                     .readIssueById()
@@ -36,9 +38,7 @@ public class IssueTest extends BaseRestAssuredTest {
                     .passes()
                         .issueDeleteCheck();
         } else {
-            issueClient
-                    .createIssue(summary, description)
-                    .passes()
+            issueSpecs
                     .issueCreateCheck(expectedStatusCode);
         }
 

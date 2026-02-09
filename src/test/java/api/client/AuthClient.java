@@ -3,7 +3,7 @@ package api.client;
 import api.specs.response.AuthSpecs;
 import io.restassured.response.Response;
 
-import static api.specs.request.RequestSpecs.authRequestSpec;
+import static api.specs.request.AuthRequestSpec.authRequestSpec;
 import static io.restassured.RestAssured.given;
 
 public class AuthClient {
