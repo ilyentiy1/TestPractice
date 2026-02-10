@@ -3,6 +3,7 @@ package api.specs.response;
 import api.client.ProjectClient;
 import io.restassured.response.Response;
 import lombok.AllArgsConstructor;
+import org.junit.jupiter.api.Assertions;
 
 @AllArgsConstructor
 public class ProjectSpecs {
@@ -17,11 +18,14 @@ public class ProjectSpecs {
         return this;
     }
 
-    public ProjectSpecs projectReadCheck() {
+    public ProjectSpecs projectReadCheck(String expectedName) {
         response
                 .then()
                 .log().all()
                 .statusCode(200);
+
+        Assertions.assertEquals(expectedName,
+                response.then().extract().body().jsonPath().getString("name"));
         return this;
     }
 

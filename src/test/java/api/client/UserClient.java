@@ -40,13 +40,12 @@ public class UserClient {
         return this;
     }
 
-    public UserClient readUsers() {
-        response = given()
-                        .spec(userRequestSpec())
-                        .queryParam("fields", "id,login,name")
-                        .when()
-                        .get();
-        return this;
+    public Response readUsers() {
+        return given()
+                .spec(userRequestSpec())
+                .queryParam("fields", "id,login,name")
+                .when()
+                .get();
     }
 
     public UserClient readUserById() {
@@ -56,6 +55,7 @@ public class UserClient {
                 .pathParam("user_id", currentId)
                 .when()
                 .get( "/{user_id}");
+
         return this;
     }
 
@@ -78,6 +78,7 @@ public class UserClient {
                 .delete( "/{user_id}");
         return this;
     }
+
 
     public UserSpecs passes() {
         return new UserSpecs(response, this);

@@ -27,13 +27,12 @@ public class ProjectClient {
         return this;
     }
 
-    public ProjectClient readProjects() {
-        response = given()
+    public Response readProjects() {
+        return response = given()
                 .spec(projectRequestSpec())
                 .queryParam("fields", "id, name")
                 .when()
                 .get();
-        return this;
     }
 
     public ProjectClient readProjectById() {

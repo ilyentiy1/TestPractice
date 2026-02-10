@@ -3,6 +3,7 @@ package api.specs.response;
 import api.client.UserClient;
 import io.restassured.response.Response;
 import lombok.AllArgsConstructor;
+import org.junit.jupiter.api.Assertions;
 
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
@@ -25,12 +26,14 @@ public class UserSpecs {
         return this;
     }
 
-    public UserSpecs userReadCheck() {
+    public UserSpecs userReadCheck(String expectedLogin) {
         response
                 .then()
                 .log().all()
                 .statusCode(200);
 
+        Assertions.assertEquals(expectedLogin,
+                response.then().extract().body().jsonPath().getString("login"));
         return this;
     }
 

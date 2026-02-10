@@ -1,11 +1,15 @@
 package api.tests.User;
 
+
 import api.specs.response.UserSpecs;
 import api.tests.BaseTest;
 import api.client.UserClient;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+
+import java.util.List;
 
 @DisplayName("Тестирование обновления данных пользователя")
 public class UserUpdateTest extends BaseTest {
@@ -37,12 +41,24 @@ public class UserUpdateTest extends BaseTest {
                     .then()
                     .readUserById()
                     .passes()
-                    .userReadCheck();
+                    .userReadCheck(login);
         } else {
             userSpecs
                     .userUpdateCheck(expectedStatusCode);
         }
 
         userSpecs.then().deleteUser();
+
+        List<String> usersLogins = new UserClient()
+                .readUsers()
+                .then()
+                .extract().body().jsonPath().getList("users.login");
+
+        /*
+        - Проверка на основе логинов пользователей
+        - Проверка того, что после удаления ранее созданной сущности больше нет в БД
+        - Проверка того, что в БД нет записи с невалидными данными
+         */
+        Assertions.assertTrue(usersLogins.stream().noneMatch(x -> x.contains(login)));
     }
 }

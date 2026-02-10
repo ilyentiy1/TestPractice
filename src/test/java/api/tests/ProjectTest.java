@@ -2,9 +2,12 @@ package api.tests;
 
 import api.client.ProjectClient;
 import api.specs.response.ProjectSpecs;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+
+import java.util.List;
 
 @DisplayName("Тестирование CRUD над проектом")
 public class ProjectTest extends BaseTest {
@@ -33,7 +36,7 @@ public class ProjectTest extends BaseTest {
                     .then()
                     .readProjectById()
                     .passes()
-                    .projectReadCheck()
+                    .projectReadCheck(name)
                     .then()
                     .deleteProject()
                     .passes()
@@ -42,6 +45,13 @@ public class ProjectTest extends BaseTest {
             projectSpecs
                     .projectCreateCheck(expectedStatusCode);
         }
+
+        List<String> projectsNames = new ProjectClient()
+                .readProjects()
+                .then()
+                .extract().body().jsonPath().getList("projects.name");
+
+        Assertions.assertTrue(projectsNames.stream().noneMatch(x -> x.contains(name)));
 
     }
 }

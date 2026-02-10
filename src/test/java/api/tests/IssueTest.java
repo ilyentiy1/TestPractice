@@ -2,9 +2,12 @@ package api.tests;
 
 import api.client.IssueClient;
 import api.specs.response.IssueSpecs;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+
+import java.util.List;
 
 @DisplayName("Тестирование CRUD над сущностью задачи")
 public class IssueTest extends BaseTest {
@@ -32,7 +35,7 @@ public class IssueTest extends BaseTest {
                     .then()
                     .readIssueById()
                     .passes()
-                        .issueReadCheck()
+                        .issueReadCheck(summary)
                     .then()
                     .deleteIssue()
                     .passes()
@@ -41,6 +44,13 @@ public class IssueTest extends BaseTest {
             issueSpecs
                     .issueCreateCheck(expectedStatusCode);
         }
+
+        List<String> issuesSummaries = new IssueClient()
+                .readIssues()
+                .then()
+                .extract().body().jsonPath().getList("issues.summary");
+
+        Assertions.assertTrue(issuesSummaries.stream().noneMatch(x -> x.contains(summary)));
 
     }
 }

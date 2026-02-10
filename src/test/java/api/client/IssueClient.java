@@ -29,13 +29,12 @@ public class IssueClient {
         return this;
     }
 
-    public IssueClient readIssues() {
-        response = given()
+    public Response readIssues() {
+        return given()
                 .spec(issueRequestSpec())
                 .queryParam("fields", "summary,idReadable,description,project(id,name)")
                 .when()
                 .get();
-        return this;
     }
 
     public IssueClient readIssueById() {
